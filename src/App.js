@@ -1,6 +1,9 @@
 import React from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
+// import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import "./App.css";
 
 const emailRegexp = /^\w+([\.-]?\w+)+@\w+([\.:]?\w+)+(\.[a-zA-Z0-9]{2,3})+$/;
@@ -11,28 +14,29 @@ function App() {
   const validationSchema = yup.object().shape({
     email: yup
       .string()
-      .email("Please enter a valid email")
-      .matches(emailRegexp, "Doesn't match the rule")
-      .required("Required"),
-    password: yup.string().min(6).max(12).required("Required"),
+      .email("Введите email")
+      .matches(emailRegexp, "Некорректный email")
+      .required("Обязательное поле"),
+    password: yup.string().min(6).max(12).required("Обязательное поле"),
     confirmPassword: yup
       .string()
-      .oneOf([yup.ref("password")], "Password mismatch")
-      .required("Required"),
-    name: yup.string().min(1).max(12).required("Required"),
+      .oneOf([yup.ref("password")], "Пароли не совпадают")
+      .required("Обязательное поле"),
+    name: yup.string().min(1).max(12).required("Обязательное поле"),
   });
 
   const formik = useFormik({
     initialValues: {
-      name: "",
       email: "",
       password: "",
       confirmPassword: "",
+      name: "",
     },
-    onSubmit: (values) => {
+    validationSchema,
+    onSubmit: (values, { resetForm }) => {
       console.log(JSON.stringify(values, null, 2));
+      resetForm();
     }, // метод, що викликає функцію при відправленні форми
-    validationSchema: validationSchema,
   });
 
   const {
@@ -46,58 +50,76 @@ function App() {
     handleBlur,
   } = formik;
 
+  console.log("formik: ", formik);
+
   return (
-    <form onSubmit={handleSubmit} className={"form"}>
-      <label htmlFor={"email"}>E-mail</label>
-      <input
-        id={"email"}
-        type={"email"}
-        name={"email"}
-        value={values.email}
-        onChange={handleChange}
-        onBlur={handleBlur}
-      ></input>
-      {touched.email && errors.email && <p>{errors.email}</p>}
+    <>
+      <form onSubmit={handleSubmit} className={"form"}>
+        <label htmlFor={"email"}>E-mail</label>
+        <input
+          id={"email"}
+          type={"email"}
+          name={"email"}
+          value={values.email}
+          onChange={handleChange}
+          onBlur={handleBlur}
+        ></input>
+        {/* {touched.email && errors.email ? toast.warn(errors.email) : null} */}
+        {touched.email && errors.email && <p>{errors.email}</p>}
 
-      <label htmlFor={"password"}>Пароль</label>
-      <input
-        id={"password"}
-        type={"password"}
-        name={"password"}
-        value={values.password}
-        onChange={handleChange}
-        onBlur={handleBlur}
-      ></input>
-      {touched.password && errors.password && <p>{errors.password}</p>}
+        <label htmlFor={"password"}>Пароль</label>
+        <input
+          id={"password"}
+          type={"password"}
+          name={"password"}
+          value={values.password}
+          onChange={handleChange}
+          onBlur={handleBlur}
+        ></input>
+        {/* {touched.password && errors.password
+          ? toast.warn(errors.password)
+          : null} */}
+        {touched.password && errors.password && <p>{errors.password}</p>}
 
-      <label htmlFor={"confirmPassword"}>Подтвердите пароль</label>
-      <input
-        id={"confirmPassword"}
-        type={"password"}
-        name={"confirmPassword"}
-        value={values.confirmPassword}
-        onChange={handleChange}
-        onBlur={handleBlur}
-      ></input>
-      {touched.confirmPassword && errors.confirmPassword && (
-        <p>{errors.confirmPassword}</p>
-      )}
+        <label htmlFor={"confirmPassword"}>Подтвердите пароль</label>
+        <input
+          id={"confirmPassword"}
+          type={"password"}
+          name={"confirmPassword"}
+          value={values.confirmPassword}
+          onChange={handleChange}
+          onBlur={handleBlur}
+        ></input>
+        {/* {touched.confirmPassword && errors.confirmPassword
+          ? toast.warn(errors.confirmPassword)
+          : null} */}
+        {touched.confirmPassword && errors.confirmPassword && (
+          <p>{errors.confirmPassword}</p>
+        )}
 
-      <label htmlFor={"name"}>Ваше имя</label>
-      <input
-        id={"name"}
-        type={"text"}
-        name={"name"}
-        value={values.name}
-        onChange={handleChange}
-        onBlur={handleBlur}
-      ></input>
-      {touched.name && errors.name && <p>{errors.name}</p>}
+        <label htmlFor={"name"}>Ваше имя</label>
+        <input
+          id={"name"}
+          type={"text"}
+          name={"name"}
+          value={values.name}
+          onChange={handleChange}
+          onBlur={handleBlur}
+        ></input>
+        {/* {touched.name && errors.name ? toast.warn(errors.name) : null} */}
+        {touched.name && errors.name && <p>{errors.name}</p>}
 
-      <button type={"submit"} disable={!(isValid && dirty)}>
-        Регистрация
-      </button>
-    </form>
+        <button type="submit" disabled={isValid && !dirty}>
+          Регистрация
+        </button>
+      </form>
+      {/* <ToastContainer
+        autoClose={2000}
+        position="top-center"
+        theme="colored"
+        limit={1}
+      /> */}
+    </>
   );
 }
 
